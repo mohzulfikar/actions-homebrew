@@ -63,7 +63,12 @@ runs:
     - name: Unlink workspace
       run: |
         # Unlink workspace
-        rm "${GITHUB_WORKSPACE}"
+        if [[ ${{ inputs.ci_test_mode }} == "1" ]]
+        then
+          mv "${GITHUB_WORKSPACE}" "${GITHUB_WORKSPACE}-link"
+        else
+          rm "${GITHUB_WORKSPACE}"
+        fi
         mkdir "${GITHUB_WORKSPACE}"
       shell: bash
 
