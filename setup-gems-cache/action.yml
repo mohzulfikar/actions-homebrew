@@ -9,6 +9,12 @@ inputs:
     description: Enable relink specific behavior on the composite action
     required: false
     default: '0'
+  gems-path:
+    description: Path to be used as input to cache action
+    required: true
+  gems-hash:
+    description: Hash string to be used as input to cache action
+    required: true
 
 runs:
   using: composite
@@ -74,8 +80,8 @@ runs:
       id: cache
       uses: actions/cache@v3
       with:
-        path: ${{ steps.set-up-homebrew.outputs.gems-path }}
-        key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+        path: ${{ inputs.gems-path }}
+        key: ${{ runner.os }}-rubygems-${{ inputs.gems-hash }}
         restore-keys: ${{ runner.os }}-rubygems-
         
     # Workaround until the `cache` action uses the changes from
