@@ -1,20 +1,18 @@
-name: Setup Cache
-description: Setup Cache for workflow
+name: Setup Gems Cache
+description: Setup Gems Caching for workflow
 inputs:
   ci_test_mode: 
     description: Determine the composite action behavior on normal and ci test mode
+    required: false
+    default: '0'
+  relink: 
+    description: Enable relink specific behavior on the composite action
     required: false
     default: '0'
 
 runs:
   using: composite
   steps:
-    - name: Set up Homebrew
-      id: set-up-homebrew
-      uses: Homebrew/actions/setup-homebrew@master
-      with:
-        test-bot: false
-
     - name: Check out Pull Request
       uses: actions/checkout@v3
       with:
@@ -63,7 +61,7 @@ runs:
     - name: Unlink workspace
       run: |
         # Unlink workspace
-        if [[ ${{ inputs.ci_test_mode }} == "1" ]]
+        if [[ ${{ inputs.relink }} == "1" ]]
         then
           mv "${GITHUB_WORKSPACE}" "${GITHUB_WORKSPACE}-link"
         else
@@ -87,7 +85,7 @@ runs:
         # Re-link workspace
         rmdir "${GITHUB_WORKSPACE}"
         mv "${GITHUB_WORKSPACE}-link" "${GITHUB_WORKSPACE}"
-      if: inputs.ci_test_mode == '1'
+      if: inputs.relink == '1'
       shell: bash
 
     - name: Install Homebrew Gems
