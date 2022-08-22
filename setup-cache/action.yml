@@ -24,6 +24,7 @@ runs:
       
     - name: Clean up CI machine
       run: |
+        # Clean up CI machine
         if ! brew list --cask visual-studio &>/dev/null; then
           if ! rm -r '/Applications/Visual Studio.app'; then
             echo '::warning::Removing Visual Studio is no longer necessary.'
@@ -61,6 +62,7 @@ runs:
     # https://github.com/actions/toolkit/pull/580.
     - name: Unlink workspace
       run: |
+        # Unlink workspace
         rm "${GITHUB_WORKSPACE}"
         mkdir "${GITHUB_WORKSPACE}"
       shell: bash
@@ -77,6 +79,7 @@ runs:
     # https://github.com/actions/toolkit/pull/580.
     - name: Re-link workspace
       run: |
+        # Re-link workspace
         rmdir "${GITHUB_WORKSPACE}"
         mv "${GITHUB_WORKSPACE}-link" "${GITHUB_WORKSPACE}"
       if: inputs.ci_test_mode == '1'
@@ -84,6 +87,8 @@ runs:
 
     - name: Install Homebrew Gems
       id: gems
-      run: brew install-bundler-gems
+      run: |
+        # Install Homebrew Gems
+        brew install-bundler-gems
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
