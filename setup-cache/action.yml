@@ -1,5 +1,10 @@
 name: Setup Cache
 description: Setup Cache for workflow
+inputs:
+  ci_test_mode: 
+    description: Determine the composite action behavior on normal and ci test mode
+    required: false
+    default: '0'
 
 runs:
   using: composite
@@ -9,6 +14,48 @@ runs:
       uses: Homebrew/actions/setup-homebrew@master
       with:
         test-bot: false
+
+    - name: Check out Pull Request
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+      if: inputs.ci_test_mode == '1'
+      
+    - name: Clean up CI machine
+      run: |
+        if ! brew list --cask visual-studio &>/dev/null; then
+          if ! rm -r '/Applications/Visual Studio.app'; then
+            echo '::warning::Removing Visual Studio is no longer necessary.'
+          fi
+        fi
+        
+        if ! brew uninstall --cask julia && ! rm -r /Applications/Julia-*.app; then
+          echo '::warning::Removing Julia is no longer necessary.'
+        fi
+
+        if ! rm /usr/local/share/man/man1/al.1 || \
+            ! sudo rm /etc/paths.d/mono-commands || \
+            ! sudo rm -r /Library/Frameworks/Mono.framework || \
+            ! sudo pkgutil --forget com.xamarin.mono-MDK.pkg; then
+          echo '::warning::Uninstalling Mono is no longer necessary.'
+        fi
+
+        if ! rm /usr/local/bin/dotnet; then
+          echo '::warning::Removing `dotnet` symlink is no longer necessary.'
+        fi
+
+        if ! rm /usr/local/bin/pod; then
+          echo '::warning::Removing `cocoapods` symlink is no longer necessary.'
+        fi
+
+        if ! rm /usr/local/bin/conda; then
+          echo '::warning::Removing `conda` symlink is no longer necessary.'
+        fi
+
+        brew unlink python && brew link --overwrite python
+      if: runner.os == 'macOS' && inputs.ci_test_mode == '1'
+      shell: bash
 
     # Workaround until the `cache` action uses the changes from
     # https://github.com/actions/toolkit/pull/580.
@@ -25,6 +72,15 @@ runs:
         path: ${{ steps.set-up-homebrew.outputs.gems-path }}
         key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
         restore-keys: ${{ runner.os }}-rubygems-
+        
+    # Workaround until the `cache` action uses the changes from
+    # https://github.com/actions/toolkit/pull/580.
+    - name: Re-link workspace
+      run: |
+        rmdir "${GITHUB_WORKSPACE}"
+        mv "${GITHUB_WORKSPACE}-link" "${GITHUB_WORKSPACE}"
+      if: inputs.ci_test_mode == '1'
+      shell: bash
 
     - name: Install Homebrew Gems
       id: gems
