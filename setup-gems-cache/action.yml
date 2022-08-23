@@ -109,13 +109,5 @@ runs:
       run: |
         # Install Homebrew Gems
         brew install-bundler-gems
-      if: steps.cache.outputs.cache-hit == 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
-
-    - name: Echo gems outputs outcome
-      if: steps.cache.outputs.cache-hit == 'true'
-      id: gems-cache-outcome
-      shell: /bin/bash -e {0}
-      run: |
-        echo '::set-output name=gems-outcome::${{ steps.gems.outcome }}'
-        echo ${{ steps.gems.outcome }}
