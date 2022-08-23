@@ -111,3 +111,9 @@ runs:
         brew install-bundler-gems
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
+
+    - name: Echo gems outputs outcome
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: /bin/bash -e {0}
+      run: |
+        echo ${{ steps.gems.outcome }}
