@@ -15,6 +15,10 @@ inputs:
   gems-hash:
     description: Hash string to be used as input to cache action
     required: true
+outputs:
+  gems-outcome:
+    description: "Brew Install Bundler Gems steps outcome"
+    value: ${{ steps.gems.outputs.outcome }}
 
 runs:
   using: composite
