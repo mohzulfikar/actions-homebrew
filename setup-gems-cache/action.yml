@@ -98,6 +98,12 @@ runs:
       if: inputs.relink == '1'
       shell: bash
 
+    - name: echo cache outputs
+      shell: /bin/bash -e {0}
+      run: |
+        # cache outputs
+        echo ${{ steps.cache.outputs.cache-hit }}
+
     - name: Install Homebrew Gems
       id: gems
       run: |
